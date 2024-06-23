@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "251749769626",
+    "firebase_url": "https://dropbox-clone-716f7-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "dropbox-clone-716f7",
+    "storage_bucket": "dropbox-clone-716f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:251749769626:android:81b91470d222c8f0b3da23",
+        "android_client_info": {
+          "package_name": "dev.k1k1.kikistorage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "251749769626-c2ffkkp0mgatm0dptf4grpqtjr4mmioc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeAcW2GdbJYWVHa76OxoFSd0j-cQnq2fk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "251749769626-c2ffkkp0mgatm0dptf4grpqtjr4mmioc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

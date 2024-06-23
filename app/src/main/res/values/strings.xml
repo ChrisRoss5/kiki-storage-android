@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Kiki Storage</string>
+    <string name="bin">Bin</string>
+    <string name="starred">Starred</string>
+    <string name="drive">Drive</string>
+    <string name="set_location">Set location…</string>
+    <string name="exit">exit</string>
+    <string name="really_exit_the_application">Really exit the application?</string>
+    <string name="cancel">Cancel</string>
+    <string name="app_logo">App logo</string>
+    <string name="home">Home</string>
+    <string name="account">Account</string>
+    <string name="sign_out">Sign out</string>
+    <string name="item_icon">Item icon</string>
+    <string name="this_location_is_empty">This location is empty.</string>
+    <string name="add_new_item">Add new item</string>
+    <string name="folder">Folder</string>
+    <string name="upload">Upload</string>
+    <string name="scan">Scan</string>
+    <string name="enter_new_folder_name">Enter new folder name…</string>
+    <string name="add">Add</string>
+    <string name="add_folder">Add Folder</string>
+</resources>

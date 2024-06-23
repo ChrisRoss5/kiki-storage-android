@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/drive"
+        android:icon="@drawable/outline_cloud_24"
+        android:title="@string/drive" />
+    <item
+        android:id="@+id/starred"
+        android:icon="@drawable/outline_star_border_24"
+        android:title="@string/starred" />
+    <item
+        android:id="@+id/bin"
+        android:icon="@drawable/outline_delete_24"
+        android:title="@string/bin" />
+</menu>
