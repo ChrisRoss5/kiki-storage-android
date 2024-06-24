@@ -6,6 +6,7 @@ import android.view.inputmethod.InputMethodManager
 
 object KeyboardUtil {
     fun hideKeyboard(context: Context, view: View) {
+        view.clearFocus()
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }

@@ -1,18 +1,17 @@
 package dev.k1k1.kikistorage.adapter
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import dev.k1k1.kikistorage.R
 import dev.k1k1.kikistorage.model.Item
+import dev.k1k1.kikistorage.util.ItemUtil
 
 class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val icon: ImageView = view.findViewById(R.id.icon)
@@ -33,21 +32,21 @@ class ItemAdapter(
         return ItemViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int, model: Item) {
-        holder.name.text = model.name
+        holder.name.text = model.name + (if (!model.isFolder) "." + model.type else "")
 
-        val context = holder.icon.context
-        val resourceName = "vivid_file_icon_" + (if (model.isFolder) "folder" else model.type)
-        val resourceId = getDrawableResourceId(context, resourceName)
-
-        holder.icon.setImageDrawable(
-            AppCompatResources.getDrawable(
-                context,
-                if (resourceId != 0) resourceId else R.drawable.vivid_file_icon_blank
+        if (model.isStarred) {
+            holder.name.setCompoundDrawablesWithIntrinsicBounds(
+                0,
+                0,
+                R.drawable.outline_star_border_24,
+                0
             )
-        )
+        }  // todo
 
-        // Set click listeners for item options
+        val icon = ItemUtil.getItemIcon(holder.icon.context, model)
+        holder.icon.setImageDrawable(icon)
         holder.itemView.setOnClickListener {
             onItemClick(model)
         }
@@ -62,8 +61,4 @@ class ItemAdapter(
         emptyStateTextView.visibility = if (itemCount == 0) View.VISIBLE else View.GONE
     }
 
-    @SuppressLint("DiscouragedApi")
-    private fun getDrawableResourceId(context: Context, resourceName: String): Int {
-        return context.resources.getIdentifier(resourceName, "drawable", context.packageName)
-    }
 }

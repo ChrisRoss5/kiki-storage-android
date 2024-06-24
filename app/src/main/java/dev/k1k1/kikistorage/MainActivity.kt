@@ -1,11 +1,9 @@
 package dev.k1k1.kikistorage
 
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -19,6 +17,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dev.k1k1.kikistorage.databinding.ActivityMainBinding
 import dev.k1k1.kikistorage.framework.startActivity
+import dev.k1k1.kikistorage.util.DialogUtil
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -38,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         if (auth.currentUser == null) {
-            startActivity<SignInActivity>();
+            startActivity<SignInActivity>()
             finish()
             return
         }
@@ -81,25 +80,12 @@ class MainActivity : AppCompatActivity() {
                 toggleDrawer()
                 return true
             }
-
             R.id.menuExit -> {
-                exitApp()
+                DialogUtil.showExitAppDialog(this) { finish() }
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun exitApp() {
-        AlertDialog.Builder(this).apply {
-            setTitle(R.string.exit)
-            setMessage(getString(R.string.really_exit_the_application))
-            setIcon(R.drawable.baseline_exit_to_app_24)
-            setCancelable(true)
-            setNegativeButton(getString(R.string.cancel), null)
-            setPositiveButton("OK") { _, _ -> finish() }
-            show()
-        }
     }
 
     private fun toggleDrawer() {

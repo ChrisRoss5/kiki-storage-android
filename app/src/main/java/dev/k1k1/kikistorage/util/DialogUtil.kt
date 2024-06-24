@@ -16,7 +16,6 @@ object DialogUtil {
     fun showAddFolderDialog(context: Context, onAddFolder: (String) -> Unit) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.add_folder, null)
         val folderNameEditText = dialogView.findViewById<EditText>(R.id.folderNameEditText)
-
         val dialog = AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.add_folder))
             .setView(dialogView)
@@ -28,7 +27,6 @@ object DialogUtil {
             }
             .setNegativeButton(context.getString(R.string.cancel), null)
             .create()
-
         dialog.show()
     }
 
@@ -41,7 +39,6 @@ object DialogUtil {
         val bottomSheetDialog = BottomSheetDialog(context)
         val bottomSheetView = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_add, null)
         bottomSheetDialog.setContentView(bottomSheetView)
-
         bottomSheetView.findViewById<FloatingActionButton>(R.id.fab_folder).setOnClickListener {
             bottomSheetDialog.dismiss()
             onFolderClick()
@@ -54,7 +51,6 @@ object DialogUtil {
             bottomSheetDialog.dismiss()
             onScanClick()
         }
-
         bottomSheetDialog.show()
     }
 
@@ -68,5 +64,29 @@ object DialogUtil {
     fun openCamera(context: Context, requestCode: Int) {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         (context as Activity).startActivityForResult(intent, requestCode)
+    }
+
+    fun showExitAppDialog(context: Context, onExit: () -> Unit) {
+        AlertDialog.Builder(context).apply {
+            setTitle(R.string.exit)
+            setMessage(context.getString(R.string.really_exit_the_application))
+            setIcon(R.drawable.baseline_exit_to_app_24)
+            setCancelable(true)
+            setNegativeButton(context.getString(R.string.cancel), null)
+            setPositiveButton("OK") { _, _ -> onExit() }
+            show()
+        }
+    }
+
+    fun showAreYouSureDialog(context: Context, onConfirm: () -> Unit) {
+        AlertDialog.Builder(context).apply {
+            setTitle(context.getString(R.string.are_you_sure))
+            setMessage(context.getString(R.string.this_action_cannot_be_undone))
+            setIcon(R.drawable.baseline_warning_amber_24)
+            setCancelable(true)
+            setNegativeButton(context.getString(R.string.cancel), null)
+            setPositiveButton("OK") { _, _ -> onConfirm() }
+            show()
+        }
     }
 }

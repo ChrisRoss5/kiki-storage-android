@@ -20,4 +20,16 @@
     <string name="enter_new_folder_name">Enter new folder name…</string>
     <string name="add">Add</string>
     <string name="add_folder">Add Folder</string>
+    <string name="there_was_an_error_signing_in">There was an error signing in</string>
+    <string name="move_to_bin">Move to bin</string>
+    <string name="add_to_starred">Add to starred</string>
+    <string name="download">Download</string>
+    <string name="size">Size:</string>
+    <string name="date_added">Date added:</string>
+    <string name="date_modified">Date modified:</string>
+    <string name="type">Type:</string>
+    <string name="name">Name:</string>
+    <string name="delete_permanently">Delete Permanently</string>
+    <string name="this_action_cannot_be_undone">This action cannot be undone.</string>
+    <string name="are_you_sure">Are you sure?</string>
 </resources>

@@ -3,12 +3,14 @@ package dev.k1k1.kikistorage
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import dev.k1k1.kikistorage.databinding.ActivitySplashScreenBinding
 import dev.k1k1.kikistorage.framework.applyAnimation
 import dev.k1k1.kikistorage.framework.callDelayed
+import dev.k1k1.kikistorage.framework.isOnline
 import dev.k1k1.kikistorage.framework.startActivity
 
-private const val DELAY = 0L  // todo
+private const val DELAY = 3000L
 
 @SuppressLint("CustomSplashScreen")
 class SplashScreenActivity : AppCompatActivity() {
@@ -29,8 +31,17 @@ class SplashScreenActivity : AppCompatActivity() {
     }
 
     private fun redirect() {
-        // This will be where you check login status or do other logic later todo
         callDelayed(DELAY) {
+            if (!isOnline()) {
+                binding.ivSplash.clearAnimation()
+                binding.ivSplash.visibility = View.GONE
+                binding.tvSplash.clearAnimation()
+                binding.tvSplash.text = "No internet connection"
+                callDelayed(DELAY) {
+                    finish()
+                }
+                return@callDelayed
+            }
             startActivity<MainActivity>()
             finish()
         }

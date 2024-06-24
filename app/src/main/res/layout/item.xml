@@ -5,6 +5,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="8dp"
+    android:background="@drawable/ripple_effect"
+    android:clickable="true"
+    android:focusable="true"
     tools:ignore="UseCompoundDrawables">
 
     <ImageView
