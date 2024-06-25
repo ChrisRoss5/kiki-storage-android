@@ -56,7 +56,9 @@ dependencies {
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
-    implementation("com.google.firebase:firebase-storage-ktx:21.0.0")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
 
     // Firebase UI
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
@@ -65,8 +67,9 @@ dependencies {
     // Preferences
     implementation("androidx.preference:preference-ktx:1.2.1")
 
-    // worker todo
-    // implementation("androidx.work:work-runtime-ktx:2.8.1")
+    // Workers
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")

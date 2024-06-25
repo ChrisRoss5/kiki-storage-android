@@ -43,6 +43,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                toggleDrawer()
+                return true
+            }
+
+            R.id.menuExit -> {
+                DialogUtil.showExitAppDialog(this) { finish() }
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.exit_menu, menu)
+        val exitMenuItem = menu?.findItem(R.id.menuExit)
+        val exitIconDrawable = exitMenuItem?.icon
+        exitIconDrawable?.let {
+            it.mutate()
+            it.setTint(ContextCompat.getColor(this, R.color.white))
+        }
+        return true
+    }
+
     private fun initHamburgerMenu() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val menuIconDrawable = ContextCompat.getDrawable(this, R.drawable.baseline_menu_24)
@@ -61,31 +87,6 @@ class MainActivity : AppCompatActivity() {
             signOut()
             true
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.exit_menu, menu)
-        val exitMenuItem = menu?.findItem(R.id.menuExit)
-        val exitIconDrawable = exitMenuItem?.icon
-        exitIconDrawable?.let {
-            it.mutate()
-            it.setTint(ContextCompat.getColor(this, R.color.white))
-        }
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                toggleDrawer()
-                return true
-            }
-            R.id.menuExit -> {
-                DialogUtil.showExitAppDialog(this) { finish() }
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun toggleDrawer() {

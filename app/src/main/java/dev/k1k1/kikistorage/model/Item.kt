@@ -6,7 +6,7 @@ import com.google.firebase.firestore.PropertyName
 
 // https://firebaseopensource.com/projects/firebase/firebaseui-android/firestore/readme/
 
-// JavaBean naming pattern removes "is" prefix from booleans so PropertyName annotation is used
+// JavaBean naming pattern removes "is" prefix from booleans so PropertyName annotation is used!
 
 data class Item(
     @DocumentId var id: String? = null,

@@ -6,19 +6,30 @@ import android.graphics.drawable.Drawable
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.firebase.Timestamp
 import dev.k1k1.kikistorage.R
+import dev.k1k1.kikistorage.firebase.Firestore
 import dev.k1k1.kikistorage.model.Item
 
 object ItemUtil {
     fun createFolder(name: String, path: String) {
         val folder = Item(
-            name,
-            path,
+            name = name,
             type = "",
             dateAdded = Timestamp.now(),
             dateModified = Timestamp.now(),
+            path = path,
             isFolder = true
         )
-        FirebaseUtil.createItem(folder)
+        Firestore.createItem(folder)
+    }
+
+    fun checkItemName(context: Context, name: String): String? {
+        val characters = "\\ / : * ? \" < > |"
+        val hasInvalidChars = name.replace(" ", "").any { characters.contains(it) }
+        val errMsg = context.getString(
+            R.string.a_name_can_t_contain_any_of_the_following_characters,
+            characters
+        )
+        return errMsg.takeIf { hasInvalidChars || name.isEmpty() }
     }
 
     fun getItemIcon(context: Context, item: Item): Drawable? {

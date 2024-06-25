@@ -43,7 +43,7 @@ class ItemAdapter(
                 R.drawable.outline_star_border_24,
                 0
             )
-        }  // todo
+        }
 
         val icon = ItemUtil.getItemIcon(holder.icon.context, model)
         holder.icon.setImageDrawable(icon)
@@ -60,5 +60,4 @@ class ItemAdapter(
         super.onDataChanged()
         emptyStateTextView.visibility = if (itemCount == 0) View.VISIBLE else View.GONE
     }
-
 }

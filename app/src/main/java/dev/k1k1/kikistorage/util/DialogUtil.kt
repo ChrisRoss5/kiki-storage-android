@@ -12,7 +12,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dev.k1k1.kikistorage.R
 
 object DialogUtil {
-
     fun showAddFolderDialog(context: Context, onAddFolder: (String) -> Unit) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.add_folder, null)
         val folderNameEditText = dialogView.findViewById<EditText>(R.id.folderNameEditText)
@@ -21,37 +20,18 @@ object DialogUtil {
             .setView(dialogView)
             .setPositiveButton(context.getString(R.string.add)) { _, _ ->
                 val folderName = folderNameEditText.text.toString()
-                if (folderName.isNotEmpty()) {
+                val err = ItemUtil.checkItemName(context, folderName)
+                if (err == null) {
                     onAddFolder(folderName)
+                } else {
+                    showSimpleAlert(context, err) {
+                        showAddFolderDialog(context, onAddFolder)
+                    }
                 }
             }
             .setNegativeButton(context.getString(R.string.cancel), null)
             .create()
         dialog.show()
-    }
-
-    fun showBottomSheetDialog(
-        context: Context,
-        onFolderClick: () -> Unit,
-        onUploadClick: () -> Unit,
-        onScanClick: () -> Unit
-    ) {
-        val bottomSheetDialog = BottomSheetDialog(context)
-        val bottomSheetView = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_add, null)
-        bottomSheetDialog.setContentView(bottomSheetView)
-        bottomSheetView.findViewById<FloatingActionButton>(R.id.fab_folder).setOnClickListener {
-            bottomSheetDialog.dismiss()
-            onFolderClick()
-        }
-        bottomSheetView.findViewById<FloatingActionButton>(R.id.fab_upload).setOnClickListener {
-            bottomSheetDialog.dismiss()
-            onUploadClick()
-        }
-        bottomSheetView.findViewById<FloatingActionButton>(R.id.fab_scan).setOnClickListener {
-            bottomSheetDialog.dismiss()
-            onScanClick()
-        }
-        bottomSheetDialog.show()
     }
 
     fun openFileManager(context: Context, requestCode: Int) {
@@ -88,5 +68,13 @@ object DialogUtil {
             setPositiveButton("OK") { _, _ -> onConfirm() }
             show()
         }
+    }
+
+    fun showSimpleAlert(context: Context, message: String, onOk: () -> Unit) {
+        val builder = AlertDialog.Builder(context)
+        builder.setMessage(message)
+            .setPositiveButton("OK") { _, _ -> onOk() }
+            .create()
+            .show()
     }
 }
