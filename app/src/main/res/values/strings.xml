@@ -41,4 +41,23 @@
     <string name="upload_failed">Upload failed</string>
     <string name="upload_started">Upload started</string>
     <string name="navigate_button">Back button</string>
+    <string name="move_to">Move to…</string>
+    <string name="rename">Rename…</string>
+    <string name="renaming">Renaming \"%1$s\"</string>
+    <string name="enter_new_name">Enter new name…</string>
+    <string name="confirm">Confirm</string>
+    <string name="enter_new_path">Enter new path</string>
+    <string name="moving">Moving \"%1$s\"</string>
+    <string name="move_complete">Move complete</string>
+    <string name="delete_complete">Delete complete</string>
+    <string name="destination_does_not_exist">Destination does not exist</string>
+    <string name="rename_complete">Rename complete</string>
+    <string name="copy_path">Copy path</string>
+    <string name="email">Email: %1$s</string>
+    <string name="sign_in_methods">Sign-in methods: %1$s</string>
+    <string name="last_sign_in">Last sign-in: %1$s</string>
+    <string name="sign_up">Sign-up: %1$s</string>
+    <string name="total_storage">Total storage: %1$s / ∞</string>
+    <string name="not_signed_in">Not signed in</string>
+    <string name="signed_in_as">Signed in as %1$s</string>
 </resources>

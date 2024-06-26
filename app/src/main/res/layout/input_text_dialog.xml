@@ -6,10 +6,9 @@
     android:padding="16dp">
 
     <EditText
-        android:id="@+id/folderNameEditText"
+        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/enter_new_folder_name"
         android:importantForAutofill="no"
         android:inputType="textNoSuggestions" />
 </LinearLayout>

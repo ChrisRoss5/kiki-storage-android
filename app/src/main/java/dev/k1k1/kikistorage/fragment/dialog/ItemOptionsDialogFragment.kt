@@ -83,9 +83,25 @@ class ItemOptionsDialogFragment(private var item: Item) : BottomSheetDialogFragm
                 DialogUtil.showAreYouSureDialog(requireContext()) {
                     deleteItem(true)
                 }
-            } else {
-                deleteItem()
-            }
+            } else deleteItem()
+        }
+        binding.renameButton.setOnClickListener {
+            DialogUtil.showInputTextDialog(
+                requireContext(),
+                getString(R.string.renaming, item.name),
+                getString(R.string.enter_new_name),
+                getString(R.string.confirm),
+                ::renameItem
+            )
+        }
+        binding.moveButton.setOnClickListener {
+            DialogUtil.showInputTextDialog(
+                requireContext(),
+                getString(R.string.moving, item.name),
+                getString(R.string.enter_new_path),
+                getString(R.string.confirm),
+                ::moveItem
+            )
         }
     }
 
@@ -114,6 +130,41 @@ class ItemOptionsDialogFragment(private var item: Item) : BottomSheetDialogFragm
         }
     }
 
+    private fun renameItem(newName: String) {
+        parentFragment?.viewLifecycleOwner?.lifecycleScope?.launch {
+            Firestore.renameItem(item, newName).await()
+            withContext(Dispatchers.Main) {
+                item.name = newName
+                binding.itemName.text = newName
+                Toast.makeText(
+                    requireContext(), getString(R.string.rename_complete), Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun moveItem(newPath: String) {
+        parentFragment?.viewLifecycleOwner?.lifecycleScope?.launch {
+            try {
+                Firestore.moveItem(item, newPath).await()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(), getString(R.string.move_complete), Toast.LENGTH_SHORT
+                    ).show()
+                    dismiss()
+                }
+            } catch (e: IllegalStateException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.destination_does_not_exist),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
     private fun deleteItem(permanent: Boolean = false) {
         parentFragment?.viewLifecycleOwner?.lifecycleScope?.launch {
             if (permanent) {
@@ -122,6 +173,9 @@ class ItemOptionsDialogFragment(private var item: Item) : BottomSheetDialogFragm
                 Firestore.deleteItem(item).await()
             }
             withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    requireContext(), getString(R.string.delete_complete), Toast.LENGTH_SHORT
+                ).show()
                 dismiss()
             }
         }

@@ -1,7 +1,6 @@
 package dev.k1k1.kikistorage.firebase
 
 import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
@@ -11,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import dev.k1k1.kikistorage.model.Item
 import dev.k1k1.kikistorage.util.Constants
+import dev.k1k1.kikistorage.util.Constants.ROOT_LIST
 import kotlinx.coroutines.tasks.await
 
 object Firestore {
@@ -32,10 +32,6 @@ object Firestore {
         return item.id?.let { getUserDriveCollection()?.document(it) }
     }
 
-    fun getItems(path: String): Task<QuerySnapshot>? {
-        return getUserDriveCollection()?.whereEqualTo(Item::path.name, path)?.get()
-    }
-
     private fun getItemsWithStartingPath(path: String): Task<QuerySnapshot>? {
         return getUserDriveCollection()?.whereGreaterThanOrEqualTo(Item::path.name, path)
             ?.whereLessThanOrEqualTo(Item::path.name, "$path\uf8ff")?.get()
@@ -48,25 +44,20 @@ object Firestore {
         updateParentDateModified(item)
     }
 
-    fun deleteItem(item: Item): Task<MutableList<Task<*>>> {
+    suspend fun deleteItem(item: Item): Task<MutableList<Task<*>>> {
         updateParentDateModified(item)
         return moveItem(item, Constants.Roots.BIN)
     }
 
-    fun deleteItemPermanently(item: Item): Task<List<Task<*>>> {
+    suspend fun deleteItemPermanently(item: Item): Task<List<Task<*>>> {
         val tasks = mutableListOf<Task<*>>(deleteItemPermanentlyAction(item))
         if (!item.isFolder) return Tasks.whenAllComplete(tasks)
-        val taskCompletionSource = TaskCompletionSource<List<Task<*>>>()
-        getItemsWithStartingPath(getFullPath(item))?.addOnSuccessListener { querySnapshot ->
-            querySnapshot.documents.forEach { doc ->
-                val nestedItem = doc.toObject(Item::class.java) ?: return@forEach
-                tasks.add(deleteItemPermanentlyAction(nestedItem))
-            }
-            Tasks.whenAllComplete(tasks).addOnCompleteListener {
-                taskCompletionSource.setResult(it.result)
-            }
-        } ?: return Tasks.whenAllComplete(tasks)
-        return taskCompletionSource.task
+        val querySnapshot = getItemsWithStartingPath(getFullPath(item))?.await()
+        querySnapshot?.documents?.forEach { doc ->
+            val nestedItem = doc.toObject(Item::class.java) ?: return@forEach
+            tasks.add(deleteItemPermanentlyAction(nestedItem))
+        }
+        return Tasks.whenAllComplete(tasks)
     }
 
     private fun deleteItemPermanentlyAction(item: Item): Task<MutableList<Task<*>>> {
@@ -81,31 +72,46 @@ object Firestore {
         return getDoc(item)?.update(mapOf(Item::isStarred.name to isStarred))
     }
 
-    private fun moveItem(item: Item, newPath: String): Task<MutableList<Task<*>>> {
-        val tasks = mutableListOf<Task<*>?>()
-        val updates = getItemMoveOperationUpdates(item, newPath)
+    suspend fun renameItem(item: Item, newName: String): Task<MutableList<Task<*>>> {
+        val oldFullPath = getFullPath(item)
+        val newFullPath = item.path + "/" + newName
+        val updates = mapOf(Item::name.name to newName)
+        val tasks = mutableListOf<Task<*>?>(getDoc(item)?.update(updates))
         if (item.isFolder) {
-            tasks.add(updatePaths(getFullPath(item), newPath + "/" + item.name))
+            tasks.add(updatePaths(oldFullPath, newFullPath))
         }
-        tasks.add(getDoc(item)?.update(updates))
         updateParentDateModified(item)
         return Tasks.whenAllComplete(tasks)
     }
 
-    private fun updatePaths(oldPath: String, newPath: String): Task<List<Task<*>>> {
-        val taskCompletionSource = TaskCompletionSource<List<Task<*>>>()
+    suspend fun moveItem(item: Item, newPath: String): Task<MutableList<Task<*>>> {
+        val itemWithNewPath = item.copy(path = newPath)
+        val parentTask = getParentItemQuerySnapshotTask(itemWithNewPath)
+        if (parentTask == null && !ROOT_LIST.contains(newPath) || parentTask?.await()?.isEmpty == true) {
+            throw IllegalStateException("Parent item not found")
+        }
+        val updates = getItemMoveOperationUpdates(item, newPath)
+        val tasks = mutableListOf<Task<*>?>(getDoc(item)?.update(updates))
+        if (item.isFolder) {
+            val oldFullPath = getFullPath(item)
+            val newFullPath = newPath + "/" + item.name
+            tasks.add(updatePaths(oldFullPath, newFullPath))
+        }
+        updateParentDateModified(item)
+        updateParentDateModified(itemWithNewPath)
+        return Tasks.whenAllComplete(tasks)
+    }
+
+    private suspend fun updatePaths(oldPath: String, newPath: String): Task<List<Task<*>>> {
         val tasks = mutableListOf<Task<Void>?>()
-        getItemsWithStartingPath(oldPath)?.addOnSuccessListener { querySnapshot ->
-            querySnapshot.documents.forEach { doc ->
-                val item = doc.toObject(Item::class.java) ?: return@forEach
-                val updates = getItemMoveOperationUpdates(item, newPath)
-                tasks.add(doc.reference.update(updates))
-            }
-            Tasks.whenAllComplete(tasks).addOnCompleteListener {
-                taskCompletionSource.setResult(it.result)
-            }
-        } ?: taskCompletionSource.setResult(emptyList())
-        return taskCompletionSource.task
+        val querySnapshot = getItemsWithStartingPath(oldPath)?.await()
+        querySnapshot?.documents?.forEach { doc ->
+            val item = doc.toObject(Item::class.java) ?: return@forEach
+            val itemNewPath = item.path.replaceFirst(oldPath, newPath)
+            val updates = getItemMoveOperationUpdates(item, itemNewPath)
+            tasks.add(doc.reference.update(updates))
+        }
+        return Tasks.whenAllComplete(tasks)
     }
 
     private fun getItemMoveOperationUpdates(item: Item, newPath: String): Map<String, Any> {
@@ -120,17 +126,21 @@ object Firestore {
     }
 
     private fun updateParentDateModified(item: Item) {
-        val pathSegments = item.path.split("/")
-        if (pathSegments.size < 2) return
-        val parentName = pathSegments.last()
-        val parentPath = pathSegments.dropLast(1).joinToString("/")
-        val parentItemQuery = getUserDriveCollection()?.whereEqualTo(Item::path.name, parentPath)
-            ?.whereEqualTo(Item::name.name, parentName)?.limit(1)
-        parentItemQuery?.get()?.addOnSuccessListener { querySnapshot ->
+        getParentItemQuerySnapshotTask(item)?.addOnSuccessListener { querySnapshot ->
             querySnapshot.documents.firstOrNull()?.reference?.update(
                 Item::dateModified.name, Timestamp.now()
             )
         }
+    }
+
+    private fun getParentItemQuerySnapshotTask(item: Item): Task<QuerySnapshot>? {
+        val pathSegments = item.path.split("/")
+        if (pathSegments.size < 2) return null  // Root
+        val parentName = pathSegments.last()
+        val parentPath = pathSegments.dropLast(1).joinToString("/")
+        val parentItemQuery = getUserDriveCollection()?.whereEqualTo(Item::path.name, parentPath)
+            ?.whereEqualTo(Item::name.name, parentName)?.limit(1)
+        return parentItemQuery?.get()
     }
 
     suspend fun getTotalSize(): Long {

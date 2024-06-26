@@ -97,14 +97,13 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginVertical="8dp"
             android:background="@color/gray" />
 
         <Button
             android:id="@+id/downloadButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:drawableLeft="@drawable/baseline_file_download_24"
             android:drawableTint="@color/white"
             android:gravity="start|center_vertical"
@@ -114,17 +113,33 @@
             android:id="@+id/starButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:drawableLeft="@drawable/outline_star_border_24"
             android:drawableTint="@color/white"
             android:gravity="start|center_vertical"
             android:text="@string/add_to_starred" />
 
         <Button
+            android:id="@+id/renameButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/baseline_drive_file_rename_outline_24"
+            android:drawableTint="@color/white"
+            android:gravity="start|center_vertical"
+            android:text="@string/rename" />
+
+        <Button
+            android:id="@+id/moveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/baseline_drive_file_move_24"
+            android:drawableTint="@color/white"
+            android:gravity="start|center_vertical"
+            android:text="@string/move_to" />
+
+        <Button
             android:id="@+id/deleteButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:drawableLeft="@drawable/outline_delete_24"
             android:drawableTint="@color/white"
             android:gravity="start|center_vertical"

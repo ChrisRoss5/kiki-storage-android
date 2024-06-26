@@ -7,25 +7,16 @@ import androidx.appcompat.app.AlertDialog
 import dev.k1k1.kikistorage.R
 
 object DialogUtil {
-    fun showAddFolderDialog(context: Context, onAddFolder: (String) -> Unit) {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.add_folder_dialog, null)
-        val folderNameEditText = dialogView.findViewById<EditText>(R.id.folderNameEditText)
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.add_folder))
-            .setView(dialogView)
-            .setPositiveButton(context.getString(R.string.add)) { _, _ ->
-                val folderName = folderNameEditText.text.toString()
-                val err = ItemUtil.checkItemName(context, folderName)
-                if (err == null) {
-                    onAddFolder(folderName)
-                } else {
-                    showSimpleAlert(context, err) {
-                        showAddFolderDialog(context, onAddFolder)
-                    }
-                }
-            }
-            .setNegativeButton(context.getString(R.string.cancel), null)
-            .create()
+    fun showInputTextDialog(
+        context: Context, title: String, hint: String, btnText: String, onConfirm: (String) -> Unit
+    ) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.input_text_dialog, null)
+        val inputEditText = dialogView.findViewById<EditText>(R.id.text)
+        inputEditText.hint = hint
+        val dialog = AlertDialog.Builder(context).setTitle(title).setView(dialogView)
+            .setPositiveButton(btnText) { _, _ ->
+                onConfirm(inputEditText.text.toString())
+            }.setNegativeButton(context.getString(R.string.cancel), null).create()
         dialog.show()
     }
 
@@ -55,9 +46,6 @@ object DialogUtil {
 
     fun showSimpleAlert(context: Context, message: String, onOk: () -> Unit) {
         val builder = AlertDialog.Builder(context)
-        builder.setMessage(message)
-            .setPositiveButton("OK") { _, _ -> onOk() }
-            .create()
-            .show()
+        builder.setMessage(message).setPositiveButton("OK") { _, _ -> onOk() }.create().show()
     }
 }

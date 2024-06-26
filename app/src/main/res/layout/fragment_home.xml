@@ -8,7 +8,7 @@
 
     <ImageButton
         android:id="@+id/navigationButton"
-        android:layout_width="50dp"
+        android:layout_width="40dp"
         android:layout_height="0dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/navigate_button"
@@ -25,10 +25,20 @@
         android:imeOptions="actionGo"
         android:importantForAutofill="no"
         android:inputType="textNoSuggestions"
-        android:paddingHorizontal="10dp"
         android:paddingVertical="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/copyButton"
         app:layout_constraintStart_toEndOf="@id/navigationButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/copyButton"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/copy_path"
+        android:src="@drawable/baseline_content_copy_24"
+        app:layout_constraintBottom_toBottomOf="@id/currentPathEditText"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

@@ -18,7 +18,9 @@ import dev.k1k1.kikistorage.R
 import dev.k1k1.kikistorage.databinding.AddItemDialogBinding
 import dev.k1k1.kikistorage.firebase.Firestore
 import dev.k1k1.kikistorage.util.DialogUtil
+import dev.k1k1.kikistorage.util.DialogUtil.showSimpleAlert
 import dev.k1k1.kikistorage.util.ImageUtil
+import dev.k1k1.kikistorage.util.ItemUtil
 import dev.k1k1.kikistorage.util.ItemUtil.createFolder
 import dev.k1k1.kikistorage.util.PermissionUtil
 import dev.k1k1.kikistorage.worker.UploadWorker
@@ -86,9 +88,18 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
     }
 
     private fun addFolder() {
-        DialogUtil.showAddFolderDialog(requireContext()) {
-            Firestore.createItem(createFolder(it, path))
-            dismiss()
+        DialogUtil.showInputTextDialog(
+            requireContext(),
+            requireContext().getString(R.string.add_folder),
+            requireContext().getString(R.string.enter_new_folder_name),
+            requireContext().getString(R.string.add)
+        ) { folderName ->
+            ItemUtil.checkItemName(requireContext(), folderName)?.let {
+                showSimpleAlert(requireContext(), folderName, ::addFolder)
+            } ?: run {
+                Firestore.createItem(createFolder(folderName, path))
+                dismiss()
+            }
         }
     }
 

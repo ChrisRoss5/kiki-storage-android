@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
 
         setupListeners()
         setupItemAdapter()
-        updatePath(getStringPreference(LAST_PATH, Constants.Roots.DRIVE))
+        updatePathWithStack(getStringPreference(LAST_PATH, Constants.DEFAULT_ROOT))
 
         return binding.root
     }
@@ -61,7 +61,7 @@ class HomeFragment : Fragment() {
                 override fun handleOnBackPressed() {
                     if (pathStack.size >= 2) {
                         pathStack.pop()
-                        updatePath(pathStack.pop())
+                        updatePathWithStack(pathStack.pop())
                     } else {
                         DialogUtil.showExitAppDialog(requireContext()) {
                             requireActivity().finish()
@@ -72,26 +72,28 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupListeners() {
+        binding.navigationButton.setOnClickListener {
+            val path = pathStack.peek()
+            if (Constants.ROOT_LIST.contains(path)) return@setOnClickListener
+            updatePathWithStack(path.substringBeforeLast('/', Constants.Roots.DRIVE))
+        }
         binding.currentPathEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                s?.toString()?.let {
-                    updateItemAdapterOptions(it)
-                }
+                updatePathRelatedUI(getEditTextText())
             }
         })
-        binding.currentPathEditText.setOnEditorActionListener { _, _, _ ->
+        binding.currentPathEditText.setOnEditorActionListener { _, _, _ ->  // android:imeOptions
+            updatePathWithStack(getEditTextText())
             KeyboardUtil.hideKeyboard(requireContext(), binding.currentPathEditText)
             true
         }
-        binding.navigationButton.setOnClickListener {
-            val path = pathStack.peek()
-            if (rootToIdMap.keys.contains(path)) return@setOnClickListener
-            updatePath(path.substringBeforeLast('/', Constants.Roots.DRIVE))
+        binding.copyButton.setOnClickListener {
+            KeyboardUtil.copyToClipboard(requireContext(), "Path", getEditTextText())
         }
         @Suppress("DEPRECATION") binding.bottomNavigation.setOnNavigationItemSelectedListener {
-            updatePath(rootToIdMap.entries.find { v -> v.value == it.itemId }!!.key)
+            updatePathWithStack(rootToIdMap.entries.find { v -> v.value == it.itemId }!!.key)
             true
         }
         binding.fabAdd.setOnClickListener {
@@ -115,22 +117,26 @@ class HomeFragment : Fragment() {
         binding.itemRecyclerView.adapter = itemAdapter
     }
 
-    private fun updatePath(path: String) {
+    private fun updatePathWithStack(path: String) {
         if (!pathStack.empty() && pathStack.peek() == path) return
         val newPath =
             if (path.startsWith(Constants.Roots.STARRED) && path != Constants.Roots.STARRED) {
                 path.replace(
                     Constants.Roots.STARRED, Constants.Roots.DRIVE
                 )
-            } else path
+            } else path  // Redirect from starred to drive
         KeyboardUtil.hideKeyboard(requireContext(), binding.currentPathEditText)
         binding.currentPathEditText.setText(newPath.replaceFirstChar { it.uppercase() })
         pathStack.push(newPath)
         StackUtil.removeRepeatingTail(pathStack)
         setStringPreference(LAST_PATH, newPath)
-        updateNavigationButton(newPath)
-        updateBottomNavigation(newPath)
-        updateItemAdapterOptions(newPath)
+        updatePathRelatedUI(newPath)
+    }
+
+    private fun updatePathRelatedUI(path: String) {
+        updateNavigationButton(path)
+        updateBottomNavigation(path)
+        updateItemAdapterOptions(path)
     }
 
     private fun updateNavigationButton(path: String) {
@@ -141,7 +147,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateBottomNavigation(path: String) {
-        val rootId = rootToIdMap.entries.find { path.startsWith(it.key) }?.value ?: 0
+        val rootId = rootToIdMap.entries.find { path.startsWith(it.key) }?.value
+            ?: rootToIdMap[Constants.Roots.DRIVE]!!
         binding.bottomNavigation.menu.findItem(rootId)!!.isChecked = true
     }
 
@@ -161,7 +168,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleItemClick(item: Item) {
-        if (item.isFolder) updatePath("${pathStack.peek()}/${item.name}")
+        if (item.isFolder) updatePathWithStack("${pathStack.peek()}/${item.name}")
         else showItemOptions(item)
     }
 
@@ -182,5 +189,9 @@ class HomeFragment : Fragment() {
     private fun showItemOptions(item: Item) {
         val itemOptionsBottomSheet = ItemOptionsDialogFragment(item)
         itemOptionsBottomSheet.show(parentFragmentManager, itemOptionsBottomSheet.tag)
+    }
+
+    private fun getEditTextText(): String {
+        return binding.currentPathEditText.text.toString().replaceFirstChar { it.lowercase() }
     }
 }
