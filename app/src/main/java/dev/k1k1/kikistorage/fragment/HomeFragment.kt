@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -38,7 +39,7 @@ val rootToIdMap = mapOf(
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private var itemAdapter: ItemAdapter? = null
+    private lateinit var itemAdapter: ItemAdapter
     private val pathStack = Stack<String>()
 
     override fun onCreateView(
@@ -47,6 +48,7 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         setupListeners()
+        setupItemAdapter()
         updatePath(getStringPreference(LAST_PATH, Constants.Roots.DRIVE))
 
         return binding.root
@@ -54,8 +56,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (pathStack.size >= 2) {
@@ -70,29 +71,24 @@ class HomeFragment : Fragment() {
             })
     }
 
-    override fun onStart() {
-        super.onStart()
-        setupRecyclerView(pathStack.peek())
-    }
-
-    override fun onStop() {
-        super.onStop()
-        itemAdapter?.stopListening()
-    }
-
     private fun setupListeners() {
         binding.currentPathEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 s?.toString()?.let {
-                    setupRecyclerView(it)
+                    updateItemAdapterOptions(it)
                 }
             }
         })
         binding.currentPathEditText.setOnEditorActionListener { _, _, _ ->
             KeyboardUtil.hideKeyboard(requireContext(), binding.currentPathEditText)
             true
+        }
+        binding.navigationButton.setOnClickListener {
+            val path = pathStack.peek()
+            if (rootToIdMap.keys.contains(path)) return@setOnClickListener
+            updatePath(path.substringBeforeLast('/', Constants.Roots.DRIVE))
         }
         @Suppress("DEPRECATION") binding.bottomNavigation.setOnNavigationItemSelectedListener {
             updatePath(rootToIdMap.entries.find { v -> v.value == it.itemId }!!.key)
@@ -104,6 +100,21 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun setupItemAdapter() {
+        val userDriveCollection = Firestore.getUserDriveCollection() ?: throw IllegalStateException(
+            "Firestore collection not available"
+        )
+        val emptyQuery = userDriveCollection.whereEqualTo("a", "b")
+        itemAdapter = ItemAdapter(
+            FirestoreRecyclerOptions.Builder<Item>().setQuery(emptyQuery, Item::class.java).build(),
+            binding.emptyStateTextView,
+            onItemClick = ::handleItemClick,
+            onItemLongClick = ::showItemOptions
+        )
+        binding.itemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.itemRecyclerView.adapter = itemAdapter
+    }
+
     private fun updatePath(path: String) {
         if (!pathStack.empty() && pathStack.peek() == path) return
         val newPath =
@@ -113,12 +124,20 @@ class HomeFragment : Fragment() {
                 )
             } else path
         KeyboardUtil.hideKeyboard(requireContext(), binding.currentPathEditText)
-        binding.currentPathEditText.setText(newPath)
+        binding.currentPathEditText.setText(newPath.replaceFirstChar { it.uppercase() })
         pathStack.push(newPath)
         StackUtil.removeRepeatingTail(pathStack)
         setStringPreference(LAST_PATH, newPath)
+        updateNavigationButton(newPath)
         updateBottomNavigation(newPath)
-        setupRecyclerView(newPath)
+        updateItemAdapterOptions(newPath)
+    }
+
+    private fun updateNavigationButton(path: String) {
+        val icon = rootToIdMap[path]?.let {
+            binding.bottomNavigation.menu.findItem(it)!!.icon
+        } ?: ResourcesCompat.getDrawable(resources, R.drawable.baseline_arrow_back_24, null)
+        binding.navigationButton.setImageDrawable(icon)
     }
 
     private fun updateBottomNavigation(path: String) {
@@ -126,22 +145,18 @@ class HomeFragment : Fragment() {
         binding.bottomNavigation.menu.findItem(rootId)!!.isChecked = true
     }
 
-    private fun setupRecyclerView(path: String) {
+    private fun updateItemAdapterOptions(path: String) {
         val userDriveCollection = Firestore.getUserDriveCollection() ?: return
         val query: Query = userDriveCollection.whereEqualTo(
             if (path == Constants.Roots.STARRED) Item::isStarred.name else Item::path.name,
             if (path == Constants.Roots.STARRED) true else path
-        ).orderBy("isFolder", Query.Direction.DESCENDING).orderBy("name")
-        val options = FirestoreRecyclerOptions.Builder<Item>().setQuery(query, Item::class.java)
-            .setLifecycleOwner(viewLifecycleOwner).build()
-        itemAdapter = ItemAdapter(
-            options,
-            binding.emptyStateTextView,
-            onItemClick = ::handleItemClick,
-            onItemLongClick = ::showItemOptions
         )
-        binding.itemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.itemRecyclerView.adapter = itemAdapter
+        // .orderBy("isFolder", Query.Direction.DESCENDING).orderBy("name")
+        // - impossible to index while maintaining real-time updates
+        itemAdapter.updateOptions(
+            FirestoreRecyclerOptions.Builder<Item>().setQuery(query, Item::class.java)
+                .setLifecycleOwner(viewLifecycleOwner).build()
+        )
         toggleFabVisibility(path)
     }
 

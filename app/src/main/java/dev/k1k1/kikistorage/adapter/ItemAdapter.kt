@@ -26,6 +26,12 @@ class ItemAdapter(
 ) :
     FirestoreRecyclerAdapter<Item, ItemViewHolder>(options) {
 
+    init {
+        setHasStableIds(true)  // With getItemId() override - for animations with notifyDataSetChanged
+    }
+
+    private var sortedItems: List<Item> = emptyList()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_view, parent, false)
@@ -34,31 +40,34 @@ class ItemAdapter(
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int, model: Item) {
+        val item = sortedItems[position]
         holder.name.text =
-            model.name + (if (!model.isFolder && model.type.isNotEmpty()) "." + model.type else "")
-
-        if (model.isStarred) {
-            holder.name.setCompoundDrawablesWithIntrinsicBounds(
-                0,
-                0,
-                R.drawable.outline_star_border_24,
-                0
-            )
-        }
-
-        val icon = ItemUtil.getItemIcon(holder.icon.context, model)
-        holder.icon.setImageDrawable(icon)
+            item.name + (if (!item.isFolder && item.type.isNotEmpty()) "." + item.type else "")
+        holder.name.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            0,
+            if (item.isStarred) R.drawable.outline_star_border_24 else 0,
+            0
+        )
+        holder.icon.setImageDrawable(ItemUtil.getItemIcon(holder.icon.context, item))
         holder.itemView.setOnClickListener {
-            onItemClick(model)
+            onItemClick(item)
         }
         holder.itemView.setOnLongClickListener {
-            onItemLongClick(model)
+            onItemLongClick(item)
             true
         }
     }
 
     override fun onDataChanged() {
         super.onDataChanged()
+        sortedItems =
+            snapshots.sortedWith(compareByDescending<Item> { it.isFolder }.thenBy { it.name })
+        notifyDataSetChanged()
         emptyStateTextView.visibility = if (itemCount == 0) View.VISIBLE else View.GONE
+    }
+
+    override fun getItemId(position: Int): Long {
+        return sortedItems[position].id.hashCode().toLong()
     }
 }

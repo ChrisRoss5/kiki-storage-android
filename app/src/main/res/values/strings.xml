@@ -40,4 +40,5 @@
     <string name="upload_complete_files">Upload complete (%1$d file(s) - %2$s)</string>
     <string name="upload_failed">Upload failed</string>
     <string name="upload_started">Upload started</string>
+    <string name="navigate_button">Back button</string>
 </resources>

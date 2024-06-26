@@ -54,19 +54,18 @@ object Firestore {
     }
 
     fun deleteItemPermanently(item: Item): Task<List<Task<*>>> {
-        val taskCompletionSource = TaskCompletionSource<List<Task<*>>>()
         val tasks = mutableListOf<Task<*>>(deleteItemPermanentlyAction(item))
-        if (item.isFolder) {
-            getItemsWithStartingPath(getFullPath(item))?.addOnSuccessListener { querySnapshot ->
-                querySnapshot.documents.forEach { doc ->
-                    val nestedItem = doc.toObject(Item::class.java) ?: return@forEach
-                    tasks.add(deleteItemPermanentlyAction(nestedItem))
-                }
-                Tasks.whenAllComplete(tasks).addOnCompleteListener {
-                    taskCompletionSource.setResult(it.result)
-                }
+        if (!item.isFolder) return Tasks.whenAllComplete(tasks)
+        val taskCompletionSource = TaskCompletionSource<List<Task<*>>>()
+        getItemsWithStartingPath(getFullPath(item))?.addOnSuccessListener { querySnapshot ->
+            querySnapshot.documents.forEach { doc ->
+                val nestedItem = doc.toObject(Item::class.java) ?: return@forEach
+                tasks.add(deleteItemPermanentlyAction(nestedItem))
             }
-        }
+            Tasks.whenAllComplete(tasks).addOnCompleteListener {
+                taskCompletionSource.setResult(it.result)
+            }
+        } ?: return Tasks.whenAllComplete(tasks)
         return taskCompletionSource.task
     }
 
@@ -105,7 +104,7 @@ object Firestore {
             Tasks.whenAllComplete(tasks).addOnCompleteListener {
                 taskCompletionSource.setResult(it.result)
             }
-        }
+        } ?: taskCompletionSource.setResult(emptyList())
         return taskCompletionSource.task
     }
 
