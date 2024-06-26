@@ -1,9 +1,6 @@
 package dev.k1k1.kikistorage.util
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
@@ -11,7 +8,7 @@ import dev.k1k1.kikistorage.R
 
 object DialogUtil {
     fun showAddFolderDialog(context: Context, onAddFolder: (String) -> Unit) {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.add_folder, null)
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.add_folder_dialog, null)
         val folderNameEditText = dialogView.findViewById<EditText>(R.id.folderNameEditText)
         val dialog = AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.add_folder))

@@ -107,9 +107,11 @@ class HomeFragment : Fragment() {
     private fun updatePath(path: String) {
         if (!pathStack.empty() && pathStack.peek() == path) return
         val newPath =
-            if (path.startsWith(Constants.Roots.STARRED) && path != Constants.Roots.STARRED) path.replace(
-                Constants.Roots.STARRED, Constants.Roots.DRIVE
-            ) else path
+            if (path.startsWith(Constants.Roots.STARRED) && path != Constants.Roots.STARRED) {
+                path.replace(
+                    Constants.Roots.STARRED, Constants.Roots.DRIVE
+                )
+            } else path
         KeyboardUtil.hideKeyboard(requireContext(), binding.currentPathEditText)
         binding.currentPathEditText.setText(newPath)
         pathStack.push(newPath)
@@ -127,8 +129,9 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(path: String) {
         val userDriveCollection = Firestore.getUserDriveCollection() ?: return
         val query: Query = userDriveCollection.whereEqualTo(
-            if (path == "starred") "isStarred" else "path", if (path == "starred") true else path
-        )
+            if (path == Constants.Roots.STARRED) Item::isStarred.name else Item::path.name,
+            if (path == Constants.Roots.STARRED) true else path
+        ).orderBy("isFolder", Query.Direction.DESCENDING).orderBy("name")
         val options = FirestoreRecyclerOptions.Builder<Item>().setQuery(query, Item::class.java)
             .setLifecycleOwner(viewLifecycleOwner).build()
         itemAdapter = ItemAdapter(

@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import dev.k1k1.kikistorage.model.Item
 import dev.k1k1.kikistorage.util.Constants
+import kotlinx.coroutines.tasks.await
 
 object Firestore {
     private const val CLOUD_DIR = "app/drive"
@@ -36,8 +37,7 @@ object Firestore {
     }
 
     private fun getItemsWithStartingPath(path: String): Task<QuerySnapshot>? {
-        return getUserDriveCollection()
-            ?.whereGreaterThanOrEqualTo(Item::path.name, path)
+        return getUserDriveCollection()?.whereGreaterThanOrEqualTo(Item::path.name, path)
             ?.whereLessThanOrEqualTo(Item::path.name, "$path\uf8ff")?.get()
     }
 
@@ -125,19 +125,25 @@ object Firestore {
         if (pathSegments.size < 2) return
         val parentName = pathSegments.last()
         val parentPath = pathSegments.dropLast(1).joinToString("/")
-        val parentItemQuery =
-            getUserDriveCollection()
-                ?.whereEqualTo(Item::path.name, parentPath)
-                ?.whereEqualTo(Item::name.name, parentName)?.limit(1)
+        val parentItemQuery = getUserDriveCollection()?.whereEqualTo(Item::path.name, parentPath)
+            ?.whereEqualTo(Item::name.name, parentName)?.limit(1)
         parentItemQuery?.get()?.addOnSuccessListener { querySnapshot ->
             querySnapshot.documents.firstOrNull()?.reference?.update(
-                Item::dateModified.name,
-                Timestamp.now()
+                Item::dateModified.name, Timestamp.now()
             )
         }
+    }
+
+    suspend fun getTotalSize(): Long {
+        val snapshot = getItemsWithStartingPath("")?.await()
+        return snapshot?.documents?.sumOf { doc ->
+            doc.toObject(Item::class.java)?.size ?: 0L
+        } ?: 0L
     }
 
     private fun getFullPath(item: Item): String {
         return item.path + "/" + item.name
     }
 }
+
+

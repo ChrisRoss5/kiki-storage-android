@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:baselineAligned="false"
     android:gravity="center"
     android:orientation="horizontal"
-    android:padding="26dp">
+    android:padding="26dp"
+    tools:context=".fragment.dialog.AddItemDialogFragment">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -17,7 +19,7 @@
         android:padding="8dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_folder"
+            android:id="@+id/fabFolder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/folder"
@@ -42,7 +44,7 @@
         android:padding="8dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_upload"
+            android:id="@+id/fabUpload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/upload"
@@ -67,10 +69,10 @@
         android:padding="8dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_scan"
+            android:id="@+id/fabPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/scan"
+            android:contentDescription="@string/photo"
             android:src="@drawable/baseline_add_a_photo_24"
             app:backgroundTint="@color/purple"
             app:tint="@android:color/white" />
@@ -79,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/scan"
+            android:text="@string/photo"
             android:textAlignment="center" />
     </LinearLayout>
 

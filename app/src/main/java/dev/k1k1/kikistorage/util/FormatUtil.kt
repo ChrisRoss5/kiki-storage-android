@@ -1,9 +1,13 @@
 package dev.k1k1.kikistorage.util
 
+import java.text.DateFormat
 import kotlin.math.ln
 import kotlin.math.pow
 
 object FormatUtil {
+    val dateFormat: DateFormat =
+        DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+
     fun formatSize(bytes: Long): String {
         if (bytes.toInt() == 0) return "0 B"
         val i = (ln(bytes.toDouble()) / ln(1024.0)).toInt()

@@ -15,7 +15,7 @@ import androidx.work.WorkManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dev.k1k1.kikistorage.R
-import dev.k1k1.kikistorage.databinding.BottomSheetAddBinding
+import dev.k1k1.kikistorage.databinding.AddItemDialogBinding
 import dev.k1k1.kikistorage.firebase.Firestore
 import dev.k1k1.kikistorage.util.DialogUtil
 import dev.k1k1.kikistorage.util.ImageUtil
@@ -23,8 +23,10 @@ import dev.k1k1.kikistorage.util.ItemUtil.createFolder
 import dev.k1k1.kikistorage.util.PermissionUtil
 import dev.k1k1.kikistorage.worker.UploadWorker
 
+const val PROVIDER_AUTHORITY = "dev.k1k1.kikistorage.fileprovider"
+
 class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragment() {
-    private var _binding: BottomSheetAddBinding? = null
+    private var _binding: AddItemDialogBinding? = null
     private val binding get() = _binding!!
 
     private val filePickerLauncher = registerForActivityResult(
@@ -58,7 +60,7 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = BottomSheetDialog(requireContext())
-        _binding = BottomSheetAddBinding.inflate(layoutInflater, null, false)
+        _binding = AddItemDialogBinding.inflate(layoutInflater, null, false)
 
         setupListeners()
 
@@ -78,10 +80,9 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
         binding.fabUpload.setOnClickListener {
             openFilePicker()
         }
-        binding.fabScan.setOnClickListener {
+        binding.fabPhoto.setOnClickListener {
             capturePhoto()
         }
-
     }
 
     private fun addFolder() {
@@ -108,7 +109,7 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
             val photoFile = ImageUtil.createImageFile(requireContext())
             currentPhotoPath = photoFile.absolutePath
             val photoURI: Uri = FileProvider.getUriForFile(
-                requireContext(), "dev.k1k1.kikistorage.fileprovider", photoFile
+                requireContext(), PROVIDER_AUTHORITY, photoFile
             )
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
             cameraLauncher.launch(intent)
