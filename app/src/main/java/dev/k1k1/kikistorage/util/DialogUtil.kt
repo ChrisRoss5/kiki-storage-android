@@ -7,8 +7,6 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dev.k1k1.kikistorage.R
 
 object DialogUtil {
@@ -32,18 +30,6 @@ object DialogUtil {
             .setNegativeButton(context.getString(R.string.cancel), null)
             .create()
         dialog.show()
-    }
-
-    fun openFileManager(context: Context, requestCode: Int) {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "*/*"
-        (context as Activity).startActivityForResult(intent, requestCode)
-    }
-
-    fun openCamera(context: Context, requestCode: Int) {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        (context as Activity).startActivityForResult(intent, requestCode)
     }
 
     fun showExitAppDialog(context: Context, onExit: () -> Unit) {

@@ -34,7 +34,8 @@ class ItemAdapter(
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int, model: Item) {
-        holder.name.text = model.name + (if (!model.isFolder) "." + model.type else "")
+        holder.name.text =
+            model.name + (if (!model.isFolder && model.type.isNotEmpty()) "." + model.type else "")
 
         if (model.isStarred) {
             holder.name.setCompoundDrawablesWithIntrinsicBounds(

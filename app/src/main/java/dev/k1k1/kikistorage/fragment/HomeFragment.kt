@@ -54,7 +54,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (pathStack.size >= 2) {
@@ -107,8 +108,7 @@ class HomeFragment : Fragment() {
         if (!pathStack.empty() && pathStack.peek() == path) return
         val newPath =
             if (path.startsWith(Constants.Roots.STARRED) && path != Constants.Roots.STARRED) path.replace(
-                Constants.Roots.STARRED,
-                Constants.Roots.DRIVE
+                Constants.Roots.STARRED, Constants.Roots.DRIVE
             ) else path
         KeyboardUtil.hideKeyboard(requireContext(), binding.currentPathEditText)
         binding.currentPathEditText.setText(newPath)
@@ -127,9 +127,8 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(path: String) {
         val userDriveCollection = Firestore.getUserDriveCollection() ?: return
         val query: Query = userDriveCollection.whereEqualTo(
-                if (path == "starred") "isStarred" else "path",
-                if (path == "starred") true else path
-            )
+            if (path == "starred") "isStarred" else "path", if (path == "starred") true else path
+        )
         val options = FirestoreRecyclerOptions.Builder<Item>().setQuery(query, Item::class.java)
             .setLifecycleOwner(viewLifecycleOwner).build()
         itemAdapter = ItemAdapter(
@@ -144,11 +143,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleItemClick(item: Item) {
-        if (item.isFolder) {
-            updatePath("${pathStack.peek()}/${item.name}")
-            return
-        }
-        showItemOptions(item)
+        if (item.isFolder) updatePath("${pathStack.peek()}/${item.name}")
+        else showItemOptions(item)
     }
 
     private fun toggleFabVisibility(path: String) {

@@ -5,6 +5,7 @@ import kotlin.math.pow
 
 object FormatUtil {
     fun formatSize(bytes: Long): String {
+        if (bytes.toInt() == 0) return "0 B"
         val i = (ln(bytes.toDouble()) / ln(1024.0)).toInt()
         val decimals = when {
             i > 2 -> 2

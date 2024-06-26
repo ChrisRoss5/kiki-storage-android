@@ -13,14 +13,18 @@ import dev.k1k1.kikistorage.model.Item
 import dev.k1k1.kikistorage.util.Constants
 
 object Firestore {
+    private const val CLOUD_DIR = "app/drive"
     private val firestoreDb: FirebaseFirestore
         get() = FirebaseFirestore.getInstance()
-    private const val CLOUD_DIR = "app/drive"
 
     fun getUserDriveCollection(): CollectionReference? {
         return Auth.getUid()?.let {
             firestoreDb.collection("$CLOUD_DIR/$it")
         }
+    }
+
+    fun createDoc(): DocumentReference? {
+        return getUserDriveCollection()?.document()
     }
 
     private fun getDoc(item: Item): DocumentReference? {
@@ -31,7 +35,7 @@ object Firestore {
         return getUserDriveCollection()?.whereEqualTo(Item::path.name, path)?.get()
     }
 
-    fun getItemsWithStartingPath(path: String): Task<QuerySnapshot>? {
+    private fun getItemsWithStartingPath(path: String): Task<QuerySnapshot>? {
         return getUserDriveCollection()
             ?.whereGreaterThanOrEqualTo(Item::path.name, path)
             ?.whereLessThanOrEqualTo(Item::path.name, "$path\uf8ff")?.get()

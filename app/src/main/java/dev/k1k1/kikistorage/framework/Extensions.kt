@@ -23,9 +23,6 @@ inline fun <reified T : Activity> Context.startActivity() =
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         })
 
-inline fun <reified T : BroadcastReceiver> Context.sendBroadcast() =
-    sendBroadcast(Intent(this, T::class.java)) // todo
-
 fun callDelayed(delay: Long, work: () -> Unit) {
     Handler(Looper.getMainLooper()).postDelayed(
         work,
