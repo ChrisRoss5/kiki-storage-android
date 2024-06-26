@@ -17,7 +17,7 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
-        android:layout_width="@dimen/_162dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         app:headerLayout="@layout/navigation_header"

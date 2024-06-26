@@ -60,4 +60,14 @@
     <string name="total_storage">Total storage: %1$s / ∞</string>
     <string name="not_signed_in">Not signed in</string>
     <string name="signed_in_as">Signed in as %1$s</string>
+    <string name="chat_with_gemini">Chat with Gemini</string>
+    <string name="ask_gemini_anything">Ask Gemini anything...</string>
+    <string name="send_message">Send message</string>
+    <string name="attach_file">Attach file</string>
+    <string name="you">You</string>
+    <string name="profile_picture">Profile picture</string>
+    <string name="thinking">(Thinking...)</string>
+    <string name="image_attached">Image attached</string>
+    <string name="file_s_attached">File(s) attached</string>
+    <string name="file_not_supported_or_is_over_20mb_supported_input_files_include_images_pdfs_video_and_audio">File not supported or is over 20MB. Supported input files include images, PDFs, video, and audio.</string>
 </resources>

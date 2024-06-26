@@ -16,19 +16,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dev.k1k1.kikistorage.databinding.ActivityMainBinding
+import dev.k1k1.kikistorage.firebase.Auth
 import dev.k1k1.kikistorage.framework.startActivity
 import dev.k1k1.kikistorage.util.DialogUtil
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        auth = Firebase.auth
 
         initHamburgerMenu()
         initNavigation()
@@ -36,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (auth.currentUser == null) {
+        if (Auth.auth.currentUser == null) {
             startActivity<SignInActivity>()
             finish()
             return

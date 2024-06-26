@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="5dp"
     tools:context=".fragment.HomeFragment">
 
     <ImageButton
@@ -59,6 +60,7 @@
         android:id="@+id/itemRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:paddingHorizontal="11dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
         app:layout_constraintEnd_toEndOf="parent"

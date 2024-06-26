@@ -11,6 +11,7 @@
     tools:context=".fragment.dialog.AddItemDialogFragment">
 
     <LinearLayout
+        android:id="@+id/addFolderLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

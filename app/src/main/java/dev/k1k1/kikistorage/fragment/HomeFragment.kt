@@ -39,7 +39,7 @@ val rootToIdMap = mapOf(
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var itemAdapter: ItemAdapter
+    private var itemAdapter: ItemAdapter? = null
     private val pathStack = Stack<String>()
 
     override fun onCreateView(
@@ -49,7 +49,6 @@ class HomeFragment : Fragment() {
 
         setupListeners()
         setupItemAdapter()
-        updatePathWithStack(getStringPreference(LAST_PATH, Constants.DEFAULT_ROOT))
 
         return binding.root
     }
@@ -97,15 +96,13 @@ class HomeFragment : Fragment() {
             true
         }
         binding.fabAdd.setOnClickListener {
-            val itemOptionsBottomSheet = AddItemDialogFragment(pathStack.peek())
-            itemOptionsBottomSheet.show(parentFragmentManager, itemOptionsBottomSheet.tag)
+            val addIdemDialog = AddItemDialogFragment(pathStack.peek())
+            addIdemDialog.show(parentFragmentManager, addIdemDialog.tag)
         }
     }
 
     private fun setupItemAdapter() {
-        val userDriveCollection = Firestore.getUserDriveCollection() ?: throw IllegalStateException(
-            "Firestore collection not available"
-        )
+        val userDriveCollection = Firestore.getUserDriveCollection() ?: return
         val emptyQuery = userDriveCollection.whereEqualTo("a", "b")
         itemAdapter = ItemAdapter(
             FirestoreRecyclerOptions.Builder<Item>().setQuery(emptyQuery, Item::class.java).build(),
@@ -115,6 +112,7 @@ class HomeFragment : Fragment() {
         )
         binding.itemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.itemRecyclerView.adapter = itemAdapter
+        updatePathWithStack(getStringPreference(LAST_PATH, Constants.DEFAULT_ROOT))
     }
 
     private fun updatePathWithStack(path: String) {
@@ -160,10 +158,10 @@ class HomeFragment : Fragment() {
         )
         // .orderBy("isFolder", Query.Direction.DESCENDING).orderBy("name")
         // - impossible to index while maintaining real-time updates
-        itemAdapter.updateOptions(
+        itemAdapter?.updateOptions(
             FirestoreRecyclerOptions.Builder<Item>().setQuery(query, Item::class.java)
                 .setLifecycleOwner(viewLifecycleOwner).build()
-        )
+        ) ?: setupItemAdapter()
         toggleFabVisibility(path)
     }
 

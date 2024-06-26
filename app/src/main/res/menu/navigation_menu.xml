@@ -5,6 +5,10 @@
         android:icon="@drawable/baseline_home_24"
         android:title="@string/home" />
     <item
+        android:id="@+id/menuGemini"
+        android:icon="@drawable/baseline_auto_awesome_24"
+        android:title="@string/chat_with_gemini" />
+    <item
         android:id="@+id/menuAccount"
         android:icon="@drawable/baseline_account_circle_24"
         android:title="@string/account" />

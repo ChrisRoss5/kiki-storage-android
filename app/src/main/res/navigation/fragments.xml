@@ -2,11 +2,15 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragments"
-    app:startDestination="@id/menuHome">
+    app:startDestination="@id/menuGemini">
     <fragment
         android:id="@+id/menuHome"
         android:name="dev.k1k1.kikistorage.fragment.HomeFragment"
         android:label="@string/home" />
+    <fragment
+        android:id="@+id/menuGemini"
+        android:name="dev.k1k1.kikistorage.fragment.GeminiFragment"
+        android:label="@string/chat_with_gemini" />
     <fragment
         android:id="@+id/menuAccount"
         android:name="dev.k1k1.kikistorage.fragment.AccountFragment"

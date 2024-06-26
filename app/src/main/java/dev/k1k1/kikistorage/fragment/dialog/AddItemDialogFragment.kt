@@ -6,9 +6,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -27,7 +30,7 @@ import dev.k1k1.kikistorage.worker.UploadWorker
 
 const val PROVIDER_AUTHORITY = "dev.k1k1.kikistorage.fileprovider"
 
-class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragment() {
+class AddItemDialogFragment(private val path: String?) : BottomSheetDialogFragment() {
     private var _binding: AddItemDialogBinding? = null
     private val binding get() = _binding!!
 
@@ -40,7 +43,14 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
                     it.getItemAt(i).uri.toString()
                 }
             } ?: listOf(data.data.toString())
-            startUploadWorker(uris)
+            if (path == null) {
+                setFragmentResult(
+                    "files_ready",
+                    bundleOf("file_uris" to uris.toTypedArray())
+                )
+                dismiss()
+            }
+            else startUploadWorker(uris)
         }
     }
 
@@ -49,7 +59,14 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
-        startUploadWorker()
+        if (path == null) {
+            setFragmentResult(
+                "files_ready",
+                bundleOf("file_path" to currentPhotoPath)
+            )
+            dismiss()
+        }
+        else startUploadWorker()
     }
 
     private val requestCameraPermissionLauncher = registerForActivityResult(
@@ -65,6 +82,10 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
         _binding = AddItemDialogBinding.inflate(layoutInflater, null, false)
 
         setupListeners()
+
+        if (path == null) {
+            binding.addFolderLayout.visibility = View.GONE
+        }
 
         dialog.setContentView(binding.root)
         return dialog
@@ -97,7 +118,7 @@ class AddItemDialogFragment(private val path: String) : BottomSheetDialogFragmen
             ItemUtil.checkItemName(requireContext(), folderName)?.let {
                 showSimpleAlert(requireContext(), folderName, ::addFolder)
             } ?: run {
-                Firestore.createItem(createFolder(folderName, path))
+                Firestore.createItem(createFolder(folderName, path!!))
                 dismiss()
             }
         }
