@@ -44,8 +44,9 @@ object DialogUtil {
         }
     }
 
-    fun showSimpleAlert(context: Context, message: String, onOk: () -> Unit) {
+    fun showSimpleAlert(context: Context, title: String, message: String, onOk: () -> Unit) {
         val builder = AlertDialog.Builder(context)
-        builder.setMessage(message).setPositiveButton("OK") { _, _ -> onOk() }.create().show()
+        builder.setTitle(title).setMessage(message).setPositiveButton("OK") { _, _ -> onOk() }
+            .create().show()
     }
 }

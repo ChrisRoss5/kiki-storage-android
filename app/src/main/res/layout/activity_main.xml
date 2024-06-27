@@ -21,7 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         app:headerLayout="@layout/navigation_header"
-        app:itemTextColor="@drawable/navigation_text_color"
         app:menu="@menu/navigation_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

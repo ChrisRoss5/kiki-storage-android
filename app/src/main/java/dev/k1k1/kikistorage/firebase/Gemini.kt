@@ -4,14 +4,19 @@ import com.google.firebase.Firebase
 import com.google.firebase.vertexai.vertexAI
 import dev.k1k1.kikistorage.BuildConfig
 
-// Google AI Client SDK:
-// https://ai.google.dev/gemini-api/docs/get-started/tutorial?lang=android#kotlin
+/*
+ANDROID AI
+https://developer.android.com/ai/generativeai
 
-// Vertex AI for Firebase:
-// https://firebase.google.com/docs/vertex-ai/get-started?platform=android&hl=en&authuser=0#add-sdk
+Google AI Client SDK:
+https://ai.google.dev/gemini-api/docs/get-started/tutorial?lang=android#kotlin
 
-// IMPORTANT LIMITS:
-// https://firebase.google.com/docs/vertex-ai/gemini-models#detailed-info
+Vertex AI for Firebase:
+https://firebase.google.com/docs/vertex-ai/get-started?platform=android&hl=en&authuser=0#add-sdk
+
+IMPORTANT LIMITS:
+https://firebase.google.com/docs/vertex-ai/gemini-models#detailed-info
+*/
 
 object Gemini {
     /*val generativeModel = GenerativeModel(

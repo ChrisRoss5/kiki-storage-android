@@ -45,12 +45,10 @@ class AddItemDialogFragment(private val path: String?) : BottomSheetDialogFragme
             } ?: listOf(data.data.toString())
             if (path == null) {
                 setFragmentResult(
-                    "files_ready",
-                    bundleOf("file_uris" to uris.toTypedArray())
+                    "files_ready", bundleOf("file_uris" to uris.toTypedArray())
                 )
                 dismiss()
-            }
-            else startUploadWorker(uris)
+            } else startUploadWorker(uris)
         }
     }
 
@@ -61,12 +59,10 @@ class AddItemDialogFragment(private val path: String?) : BottomSheetDialogFragme
         if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
         if (path == null) {
             setFragmentResult(
-                "files_ready",
-                bundleOf("file_path" to currentPhotoPath)
+                "files_ready", bundleOf("file_path" to currentPhotoPath)
             )
             dismiss()
-        }
-        else startUploadWorker()
+        } else startUploadWorker()
     }
 
     private val requestCameraPermissionLauncher = registerForActivityResult(
@@ -115,8 +111,8 @@ class AddItemDialogFragment(private val path: String?) : BottomSheetDialogFragme
             requireContext().getString(R.string.enter_new_folder_name),
             requireContext().getString(R.string.add)
         ) { folderName ->
-            ItemUtil.checkItemName(requireContext(), folderName)?.let {
-                showSimpleAlert(requireContext(), folderName, ::addFolder)
+            ItemUtil.checkItemName(requireContext(), folderName)?.let { err ->
+                showSimpleAlert(requireContext(), getString(R.string.error), err, ::addFolder)
             } ?: run {
                 Firestore.createItem(createFolder(folderName, path!!))
                 dismiss()

@@ -121,8 +121,8 @@ class HomeFragment : Fragment() {
             if (path.startsWith(Constants.Roots.STARRED) && path != Constants.Roots.STARRED) {
                 path.replace(
                     Constants.Roots.STARRED, Constants.Roots.DRIVE
-                )
-            } else path  // Redirect from starred to drive
+                ) // Redirect from starred to drive
+            } else path
         KeyboardUtil.hideKeyboard(requireContext(), binding.currentPathEditText)
         binding.currentPathEditText.setText(newPath.replaceFirstChar { it.uppercase() })
         pathStack.push(newPath)
@@ -166,7 +166,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleItemClick(item: Item) {
-        if (item.isFolder) updatePathWithStack("${pathStack.peek()}/${item.name}")
+        if (item.isFolder) updatePathWithStack("${item.path}/${item.name}")
         else showItemOptions(item)
     }
 

@@ -6,7 +6,6 @@
             <solid android:color="@android:color/darker_gray" />
         </shape>
     </item>
-
     <item
         android:left="1dp"
         android:right="1dp"

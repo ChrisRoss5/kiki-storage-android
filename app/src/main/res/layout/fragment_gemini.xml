@@ -19,7 +19,6 @@
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:background="?attr/selectableItemBackgroundBorderless"
-
             android:contentDescription="@string/attach_file"
             android:src="@drawable/baseline_attach_file_24" />
 
@@ -52,6 +51,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/linearLayout"
-        android:background="@android:color/white"
         android:paddingHorizontal="16dp" />
 </RelativeLayout>
