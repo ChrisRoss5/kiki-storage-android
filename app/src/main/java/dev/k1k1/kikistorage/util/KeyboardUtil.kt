@@ -7,6 +7,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
+import dev.k1k1.kikistorage.R
 
 object KeyboardUtil {
     fun hideKeyboard(context: Context, view: View) {
@@ -20,7 +21,10 @@ object KeyboardUtil {
         val clip = ClipData.newPlainText(label, text)
         clipboard?.apply {
             setPrimaryClip(clip)
-            Toast.makeText(context, "$label copied to clipboard", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                context.getString(R.string.copied_to_clipboard, label), Toast.LENGTH_SHORT
+            ).show()
         }
     }
 }

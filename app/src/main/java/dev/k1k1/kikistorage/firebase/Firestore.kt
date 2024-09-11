@@ -76,7 +76,7 @@ object Firestore {
         val oldFullPath = getFullPath(item)
         val newFullPath = item.path + "/" + newName
         val updates = mapOf(Item::name.name to newName)
-        val tasks = mutableListOf<Task<*>?>(getDoc(item)?.update(updates))
+        val tasks = mutableListOf<Task<*>?>(getDoc(item)?.update(updates))  // todo check name
         if (item.isFolder) {
             tasks.add(updatePaths(oldFullPath, newFullPath))
         }

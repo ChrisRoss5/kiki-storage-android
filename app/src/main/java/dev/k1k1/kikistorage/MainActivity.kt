@@ -11,10 +11,6 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.GravityCompat
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
-import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import dev.k1k1.kikistorage.databinding.ActivityMainBinding
 import dev.k1k1.kikistorage.firebase.Auth
 import dev.k1k1.kikistorage.framework.startActivity
@@ -82,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.navView, navController)
         val signOutMenuItem = binding.navView.menu.findItem(R.id.menuSignOut)
         signOutMenuItem?.setOnMenuItemClickListener {
-            signOut()
+            Auth.signOut(this)
             true
         }
     }
@@ -93,11 +89,5 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.drawerLayout.openDrawer(GravityCompat.START)
         }
-    }
-
-    private fun signOut() {
-        AuthUI.getInstance().signOut(this)
-        startActivity<SignInActivity>()
-        finish()
     }
 }

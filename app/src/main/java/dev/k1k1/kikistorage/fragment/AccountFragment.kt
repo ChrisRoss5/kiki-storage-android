@@ -10,9 +10,13 @@ import dev.k1k1.kikistorage.R
 import dev.k1k1.kikistorage.databinding.FragmentAccountBinding
 import dev.k1k1.kikistorage.firebase.Auth
 import dev.k1k1.kikistorage.firebase.Firestore
+import dev.k1k1.kikistorage.firebase.Functions
+import dev.k1k1.kikistorage.util.DialogUtil
 import dev.k1k1.kikistorage.util.FormatUtil
 import dev.k1k1.kikistorage.util.FormatUtil.dateFormat
+import dev.k1k1.kikistorage.util.UIUtil
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AccountFragment : Fragment() {
     private lateinit var binding: FragmentAccountBinding
@@ -23,6 +27,7 @@ class AccountFragment : Fragment() {
         binding = FragmentAccountBinding.inflate(inflater, container, false)
 
         populateFields()
+        setupListeners()
 
         return binding.root
     }
@@ -48,6 +53,38 @@ class AccountFragment : Fragment() {
                 binding.textTotalStorage.text = getString(
                     R.string.total_storage, FormatUtil.formatSize(Firestore.getTotalSize())
                 )
+            }
+        }
+    }
+
+    private fun setupListeners() {
+        binding.buttonDeleteAccount.setOnClickListener { deleteAccount() }
+    }
+
+    private fun deleteAccount() {
+        DialogUtil.showAreYouSureDialog(requireContext()) {
+            binding.buttonDeleteAccount.isEnabled = false
+            binding.buttonDeleteAccount.text = getString(R.string.deleting_account)
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    val email = Auth.auth.currentUser?.email ?: ""
+                    Functions.deleteAccount().await()
+                    UIUtil.showToastOnMainThread(
+                        requireContext(),
+                        getString(R.string.account_deleted, email)
+                    )
+                    Auth.signOut(requireContext())
+                } catch (e: Exception) {
+                    binding.buttonDeleteAccount.isEnabled = true
+                    binding.buttonDeleteAccount.text = getString(R.string.delete_account)
+                    DialogUtil.showSimpleAlert(
+                        requireContext(),
+                        getString(R.string.error),
+                        getString(R.string.you_must_reauthenticate_before_deleting_your_account)
+                    ) {
+                        Auth.signOut(requireContext())
+                    }
+                }
             }
         }
     }

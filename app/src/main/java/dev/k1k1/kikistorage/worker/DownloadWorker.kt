@@ -12,8 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class DownloadWorker(
-    private val context: Context,
-    workerParams: WorkerParameters
+    private val context: Context, workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -25,8 +24,7 @@ class DownloadWorker(
                 Storage.downloadItem(item)
             }
             UIUtil.showToastOnMainThread(
-                context,
-                context.getString(R.string.downloaded_to, filePath)
+                context, context.getString(R.string.downloaded_to, filePath)
             )
             Result.success()
         } catch (e: Exception) {
